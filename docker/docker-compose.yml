@@ -1,0 +1,44 @@
+version: "3.9"
+
+name: zurgaa
+
+services:
+    app:
+        container_name: app
+        build:
+            context: ./php
+            network: host
+        ports:
+            - "9000:9000"
+        volumes:
+            - ./php/php.ini:/usr/local/etc/php/conf.d/custom.ini
+            - ./../:/var/www
+        working_dir: /var/www
+        networks:
+            - backend
+    nginx:
+        container_name: nginx
+        image: nginx:latest
+        ports:
+            - "80:80"
+        volumes:
+            - ./nginx/conf.d/:/etc/nginx/conf.d
+            - ./../:/var/www
+        networks:
+            - backend
+    db:
+        container_name: db
+        image: mysql:8.0
+        networks:
+            - backend
+        volumes:
+            - ./postgres/data:/var/lib/postgresql/data
+        ports:
+            - "3306:3306"
+        environment:
+            MYSQL_DATABASE: app
+            MYSQL_ROOT_PASSWORD: password
+
+networks:
+    backend:
+        name: backend

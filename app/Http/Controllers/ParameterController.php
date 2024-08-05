@@ -5,62 +5,86 @@ namespace App\Http\Controllers;
 use App\Http\Requests\StoreParameterRequest;
 use App\Http\Requests\UpdateParameterRequest;
 use App\Models\Parameter;
+use App\Services\ParameterService;
+use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Storage;
+use function Laravel\Prompts\error;
 
 class ParameterController extends Controller
 {
-    /**
-     * Display a listing of the resource.
-     */
-    public function index()
+    public function __construct(
+        protected ParameterService $service
+    )
     {
-        //
     }
 
-    /**
-     * Show the form for creating a new resource.
-     */
-    public function create()
+    public function index(Request $request)
     {
-        //
+        return $this->service->index($request);
     }
 
-    /**
-     * Store a newly created resource in storage.
-     */
     public function store(StoreParameterRequest $request)
     {
-        //
+
     }
 
-    /**
-     * Display the specified resource.
-     */
     public function show(Parameter $parameter)
     {
         //
     }
 
-    /**
-     * Show the form for editing the specified resource.
-     */
-    public function edit(Parameter $parameter)
-    {
-        //
-    }
-
-    /**
-     * Update the specified resource in storage.
-     */
     public function update(UpdateParameterRequest $request, Parameter $parameter)
     {
         //
     }
 
-    /**
-     * Remove the specified resource from storage.
-     */
     public function destroy(Parameter $parameter)
     {
         //
+    }
+
+    public function icon()
+    {
+
+    }
+
+    public function storeIcon(Request $request, Parameter $parameter)
+    {
+        $img = $this->service->storeIcon($request, $parameter);
+
+        return response()->json([
+            'message' => 'the icon was successfully uploaded',
+            'image' => $img
+        ]);
+    }
+
+    public function destroyIcon(Request $request, Parameter $parameter)
+    {
+        $parameter = $this->service->destroyIcon($request, $parameter);
+
+        return response()->json([
+           'message' => 'the icon was deleted',
+           'parameter' => $parameter
+        ]);
+    }
+
+    public function storeIconGray(Request $request, Parameter $parameter)
+    {
+        $img = $this->service->storeIconGray($request, $parameter);
+
+        return response()->json([
+            'message' => 'the icon gray was successfully uploaded',
+            'image' => $img
+        ]);
+    }
+
+    public function destroyIconGray(Request $request, Parameter $parameter)
+    {
+        $parameter = $this->service->destroyIconGray($request, $parameter);
+
+        return response()->json([
+            'message' => 'the icon was deleted',
+            'parameter' => $parameter
+        ]);
     }
 }

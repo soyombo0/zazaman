@@ -14,7 +14,9 @@ return new class extends Migration
         Schema::create('parameters', function (Blueprint $table) {
             $table->id();
             $table->string('title');
-            $table->integer('type')->default(1);
+            $table->integer('type');
+            $table->string('icon')->nullable();
+            $table->string('icon_gray')->nullable();
             $table->timestamps();
         });
     }

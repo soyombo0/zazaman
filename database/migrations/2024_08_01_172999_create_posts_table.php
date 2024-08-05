@@ -15,6 +15,7 @@ return new class extends Migration
             $table->id();
             $table->string('title');
             $table->string('description')->nullable();
+            $table->foreignId('parameter_id')->nullable()->constrained('parameters');
             $table->timestamps();
         });
     }

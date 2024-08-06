@@ -23,34 +23,13 @@ class ParameterController extends Controller
         return $this->service->index($request);
     }
 
-    public function store(StoreParameterRequest $request)
-    {
-
-    }
-
-    public function show(Parameter $parameter)
-    {
-        //
-    }
-
-    public function update(UpdateParameterRequest $request, Parameter $parameter)
-    {
-        //
-    }
-
-    public function destroy(Parameter $parameter)
-    {
-        //
-    }
-
-    public function icon()
-    {
-
-    }
-
     public function storeIcon(Request $request, Parameter $parameter)
     {
-        $img = $this->service->storeIcon($request, $parameter);
+        try {
+            $img = $this->service->storeIcon($request, $parameter);
+        } catch (\Exception $e) {
+            return response()->json(['error' => $e->getMessage()], 422);
+        }
 
         return response()->json([
             'message' => 'the icon was successfully uploaded',
@@ -70,7 +49,11 @@ class ParameterController extends Controller
 
     public function storeIconGray(Request $request, Parameter $parameter)
     {
-        $img = $this->service->storeIconGray($request, $parameter);
+        try {
+            $img = $this->service->storeIconGray($request, $parameter);
+        } catch (\Exception $e) {
+            return response()->json(['error' => $e->getMessage()], 422);
+        }
 
         return response()->json([
             'message' => 'the icon gray was successfully uploaded',

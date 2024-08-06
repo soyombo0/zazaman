@@ -53,6 +53,19 @@ services:
             MINIO_DEFAULT_BUCKETS: "test"
         networks:
             - backend
+    createbuckets:
+        image: minio/mc
+        networks:
+            - backend
+        depends_on:
+            - minio
+        entrypoint: >
+            /bin/sh -c "
+            /usr/bin/mc alias set myminio http://minio:9001 minioadmin minioadmin;
+            /usr/bin/mc mb myminio/test;
+            /usr/bin/mc policy set public myminio/test;
+            exit 0;
+            "
 
 networks:
     backend:

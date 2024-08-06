@@ -16,7 +16,9 @@ return new class extends Migration
             $table->string('title');
             $table->integer('type');
             $table->string('icon')->nullable();
+            $table->string('icon_path')->nullable();
             $table->string('icon_gray')->nullable();
+            $table->string('icon_gray_path')->nullable();
             $table->timestamps();
         });
     }

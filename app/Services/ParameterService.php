@@ -5,6 +5,7 @@ namespace App\Services;
 use App\Models\Parameter;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
+use function Laravel\Prompts\error;
 
 class ParameterService
 {
@@ -25,26 +26,27 @@ class ParameterService
 
     public function storeIcon(Request $request, Parameter $parameter)
     {
-        if ($parameter->type == '2') {
-            $data = $request->validate([
-                'image' => ['file', 'required']
-            ]);
-            $cloudPath = '/' . $parameter->id . '-parameter-icon';
-            $originalName = $request->file('image')->getClientOriginalName();
-            $storePath = config('image.directory') . $cloudPath . '/';
-
-            Storage::cloud()->deleteDirectory(config('image.directory') . $cloudPath);
-
-            $img = Storage::cloud()->putFileAs($storePath, $data['image'], $originalName);
-            $path = Storage::cloud()->url($img);
-
-            $parameter->icon = $path;
-            $parameter->save();
-
-            return $path;
-        } else {
-            return 'parameters type is not 2';
+        if ($parameter->type !== 2) {
+            throw new \Exception('parameters type is not 2');
         }
+
+        $data = $request->validate([
+            'image' => ['file', 'required']
+        ]);
+        $cloudPath = '/' . $parameter->id . '-parameter-icon';
+        $originalName = $request->file('image')->getClientOriginalName();
+        $originalSlug = str_slug(explode('.', $originalName)[0]);
+        $storePath = config('image.directory') . $cloudPath;
+
+        Storage::cloud()->deleteDirectory(config('image.directory') . $cloudPath);
+
+        $img = Storage::cloud()->putFileAs($storePath, $data['image'], $originalSlug  . '.' .  $request->file('image')->extension());
+
+        $parameter->icon_path = $img;
+        $parameter->icon = $originalSlug;
+        $parameter->save();
+
+        return $parameter;
     }
 
     public function destroyIcon(Request $request, Parameter $parameter)
@@ -53,6 +55,7 @@ class ParameterService
         Storage::cloud()->deleteDirectory(config('image.directory') . $cloudPath);
 
         $parameter->icon = null;
+        $parameter->icon_path = null;
         $parameter->save();
 
         return $parameter;
@@ -60,24 +63,25 @@ class ParameterService
 
     public function storeIconGray(Request $request, Parameter $parameter)
     {
-        if ($parameter->type == '2') {
-            $data = $request->validate([
-                'image' => ['file', 'required']
-            ]);
-            $cloudPath = '/' . $parameter->id . '-parameter-icon-gray';
-
-            Storage::cloud()->deleteDirectory(config('image.directory') . $cloudPath);
-
-            $img = Storage::cloud()->put(config('image.directory') . $cloudPath, $data['image']);
-            $path = Storage::cloud()->url($img);
-
-            $parameter->icon_gray = $path;
-            $parameter->save();
-
-            return $path;
-        } else {
-            return 'parameters type is not 2';
+        if ($parameter->type !== 2) {
+            throw new \Exception('parameters type is not 2');
         }
+        $data = $request->validate([
+            'image' => ['file', 'required']
+        ]);
+        $cloudPath = '/' . $parameter->id . '-parameter-icon-gray';
+        $originalName = $request->file('image')->getClientOriginalName();
+        $originalSlug = str_slug(explode('.', $originalName)[0]);
+        $storePath = config('image.directory') . $cloudPath;
+
+        Storage::cloud()->deleteDirectory(config('image.directory') . $cloudPath);
+        $img = Storage::cloud()->putFileAs($storePath, $data['image'], $originalSlug  . '.' .  $request->file('image')->extension());
+
+        $parameter->icon_gray_path = $img;
+        $parameter->icon_gray = $originalSlug;
+        $parameter->save();
+
+        return $parameter;
     }
 
     public function destroyIconGray(Request $request, Parameter $parameter)
@@ -85,7 +89,8 @@ class ParameterService
         $cloudPath = '/' . $parameter->id . '-parameter-icon-gray';
         Storage::cloud()->deleteDirectory(config('image.directory') . $cloudPath);
 
-        $parameter->icon = null;
+        $parameter->icon_gray = null;
+        $parameter->icon_gray_path = null;
         $parameter->save();
 
         return $parameter;
